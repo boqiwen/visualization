@@ -10,12 +10,10 @@
         * {
             padding: 0;
             margin: 0;
-            box-sizing: border-box;
         }
 
         .activityBox {
             border: 1px solid #cccccc;
-            position: relative;
             margin: 100px auto;
             width: 600px;
             height: 600px;
@@ -24,29 +22,26 @@
 </head>
 <body>
     <div>
+        <div id="#addDrag">添加拖拽元素</div>
         <div class="activityBox"></div>
     </div>
     
     <script src="./rewrite.js"></script>
 
     <script>
-        let redBox = new CreateDrag(".activityBox", {
-            width: 100,
-            height: 100,
+        // 基础参数
+        let baseDragData = {
+            width: 50,
+            height: 50,
             top: 0,
             left: 0,
             backgroundColor: 'red',
             className: 'redBox'
-        });
+        }
 
-        let greenBox = new CreateDrag(".activityBox", {
-            width: 100,
-            height: 100,
-            top: 100,
-            left: 100,
-            backgroundColor: 'green',
-            className: 'greenBox'
-        });
+        document.getElementById("#addDrag").addEventListener("click", (e) => {
+            new CreateDrag('.activityBox', baseDragData)
+        })
     </script>
 </body>
 </html>
