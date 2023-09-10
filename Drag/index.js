@@ -1,4 +1,3 @@
-// 限定要求描述：限定可拖拽范围 超出范围容器就不能拖动 鼠标超出返回到容器里面就可以重新移动图形
 ;(function() {
     let actionBox = document.querySelector("#actionBox"),
         operateItem = document.querySelector("#portabilityBox"),
