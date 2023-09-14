@@ -8,3 +8,5 @@
 ## 出现的问题 拖拽时mouseup事件丢失: 使用mousedown + mousemove + mouseup实现拖拽移动 总会出现 mousemove过程中鼠标出现禁止的标且不进入mouseup事件 的情况 导致无法清除mousemove事件
 ## 问题原因: 受到了选中文本的影响
 ## 解决方法: 在需要拖拽的元素上加上一条css => user-select: none; 防止text选中移动影响 mouseup 事件的进入
+
+## 主要为区分多个实例的状态 以及参数的状态 考虑参数是独有还是共享 （四个位置）

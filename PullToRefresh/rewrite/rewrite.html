@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="refreshBox"></div>
+    
+    <script src="./rewrite.js"></script>
+
+    <script>
+        const params = {
+            height: '100vh',
+            dropDownText: '拉拉拉拉拉拉！',
+            refreshingText: '刷新中',
+            refreshCompletedText: '刷新完毕！'
+        }
+
+        // 测试数据
+        let testData = [];
+
+        let refreshRef = new CreatePullToRefresh('.refreshBox', params);
+
+        // 确认刷新
+        refreshRef.touchendHandle = () => {
+            // 状态改变
+            refreshRef.stateHandle('refreshing');
+
+            refreshFn();
+        }
+
+        // 模拟请求函数
+        let refreshFn = () => {
+            setTimeout(() => {
+                // 模拟数据
+                testData.unshift({
+                    name: testData.length + ' ' + testData.length
+                });
+
+                // 处理填充的dom
+                let _appendChildHtml = document.createElement("div");
+                testData.map((item) => {
+                    let _html = document.createElement("div");
+                    _html.setAttribute("class", 'itembox');
+                    _html.style.lineHeight = "60px";
+                    _html.style.textAlign = 'center';
+                    _html.innerHTML = item.name;
+                    
+                    _appendChildHtml.appendChild(_html);
+                })
+
+                // 把需要填充的dom传进去填充
+                refreshRef.setItemDom(_appendChildHtml);
+            }, 2000);            
+        }
+    </script>
+</body>
+</html>
