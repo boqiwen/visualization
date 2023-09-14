@@ -42,7 +42,6 @@ class CreateDrag {
 
     // 根据参数设置样式
     setParams() {
-        this.dragItemBox.style.position = 'absolute';
         this.dragItemBox.style.userSelect = 'none';
         this.dragItemBox.style.border = '1px solid #cccccc';
 
@@ -52,6 +51,8 @@ class CreateDrag {
         this.dragItemBox.style.top = this.dragItemParams.top + this.activityBox.offsetTop + 'px';
         if(this.dragItemParams.type === 'refresh') {
             this.dragItemBox.style.top = this.dragItemBox.offsetTop + this._refreshHtml.clientHeight + 'px'; 
+        } else {
+            this.dragItemBox.style.position = 'absolute';   
         }
         this.dragItemBox.style.left = this.dragItemParams.left + this.activityBox.offsetLeft + 'px';
     }
@@ -121,7 +122,7 @@ class CreateDrag {
             this.dragItemBox.style.left = leftDiff + 'px';            
         } else if(this.dragItemParams.type === 'refresh') {
             if (itemScrollTop >= 0 && topDiff > 0) {
-                if(topDiff > 100) {
+                if(topDiff > 200) {
                     this.refreshRequire = true;
                 }
                 
