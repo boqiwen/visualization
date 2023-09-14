@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拖拽实现的基础上实现下拉刷新</title>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        /* 防止拖动时页面跟着动 */
+        body {
+            overflow: hidden;
+        }
+
+        .activityBox {
+            border: 1px solid #cccccc;
+            margin: 100px auto;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="activityBox"></div>
+    
+    <script src="./dragToRefresh.js"></script>
+
+    <script>
+        // 基础参数
+        let baseDragData = {
+            width: 50,
+            height: 50,
+            top: 0,
+            left: 0,
+            backgroundColor: 'red',
+            className: 'redBox'
+        }
+
+        new CreateDrag('.activityBox', baseDragData);
+    </script>
+</body>
+</html>
