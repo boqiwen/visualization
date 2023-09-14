@@ -18,9 +18,7 @@
         }
 
         .activityBox {
-            border: 1px solid #cccccc;
-            margin: 100px auto;
-            height: 600px;
+            height: 100vh;
         }
     </style>
 </head>
@@ -31,16 +29,52 @@
 
     <script>
         // 基础参数
+        let baseRefreshData = {
+            width: '100%',
+            height: '20%',
+            top: 0,
+            left: 0,
+            backgroundColor: 'green',
+            type: 'refresh', // refresh || drag
+            refreshParams: {
+                height: '100vh',
+                dropDownText: '拉',
+                refreshingText: '刷新中',
+                refreshCompletedText: '刷新完毕'
+            }
+        }
+        
         let baseDragData = {
-            width: 50,
-            height: 50,
+            width: '100%',
+            height: '20%',
             top: 0,
             left: 0,
             backgroundColor: 'red',
-            className: 'redBox'
+            type: 'drag', // refresh || drag
         }
 
-        new CreateDrag('.activityBox', baseDragData);
+        let refreshRef = new CreateDrag('.activityBox', baseRefreshData);
+        // new CreateDrag('.activityBox', baseDragData);
+
+        // 确认刷新
+        refreshRef.touchendHandle = () => {
+            // 状态改变
+            refreshRef.stateHandle('refreshing');
+
+            refreshFn();
+        }
+
+        // 模拟请求函数
+        let refreshFn = () => {
+            setTimeout(() => {
+                // 处理填充的dom
+                let _appendChildHtml = '<div style="text-align: center;">刷新了</div>';
+
+                // 把需要填充的dom传进去填充
+                refreshRef.setItemDom(_appendChildHtml);
+                
+            }, 2000);            
+        }
     </script>
 </body>
 </html>

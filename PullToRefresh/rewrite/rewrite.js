@@ -155,7 +155,7 @@ class CreatePullToRefresh {
         this.refreshBox.appendChild(setHtml);
 
         // 状态改变
-        refreshRef.stateHandle('refreshCompleted');
+        this.stateHandle('refreshCompleted');
 
         setTimeout(() => {
             this.stateHandle('init');
