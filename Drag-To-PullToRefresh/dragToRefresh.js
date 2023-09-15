@@ -50,9 +50,9 @@ class CreateDrag {
         this.dragItemBox.style.background = this.dragItemParams.backgroundColor;
         this.dragItemBox.style.top = this.dragItemParams.top + this.activityBox.offsetTop + 'px';
         if(this.dragItemParams.type === 'refresh') {
-            this.dragItemBox.style.top = this.dragItemBox.offsetTop + this._refreshHtml.clientHeight + 'px'; 
+            this.dragItemBox.style.top = this.dragItemBox.offsetTop + this._refreshHtml.clientHeight + 'px';
         } else {
-            this.dragItemBox.style.position = 'absolute';   
+            this.dragItemBox.style.position = 'absolute';
         }
         this.dragItemBox.style.left = this.dragItemParams.left + this.activityBox.offsetLeft + 'px';
     }
