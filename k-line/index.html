@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K线图实现</title>
+
+    <style>
+        * {
+            border: 0;
+            margin: 0;
+        }
+
+        .kLineBox {
+            margin: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="kLineBox"></div>
+
+    <script src="./index.js"></script>
+
+    <script>
+        // 传参
+        let kLineBaseData = {
+            width: 700,
+
+            height: 500,
+            
+            xAxisData: {
+                lineColor: '#242424',
+                lineThickness: 4,
+                data: ['2023-9-10', '2023-9-11', '2023-9-12', '2023-9-13', '2023-9-14'],
+                scaleLength: 500,
+                scaleLineColor: '#cccccc',
+                textColor: '#242424',
+            },
+
+            yAxisData: {
+                lineColor: '#242424',
+                lineThickness: 4,
+                scaleLineColor: '#cccccc',
+                textColor: '#242424',
+            },
+
+            data: [
+                {
+                    openingNum: 20,
+                    closingNum: 10,
+                    maxNum: 25,
+                    minNum: 5,
+                    text: '1111111'
+                },
+                {
+                    openingNum: 20,
+                    closingNum: 5,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '2222222'
+                },
+                {
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 15,
+                    text: '3333333'
+                },
+                {
+                    openingNum: 20,
+                    closingNum: 5,
+                    maxNum: 50,
+                    minNum: 5,
+                    text: '4444444'
+                },
+                {
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+            ]
+        }
+
+        const kLineRef = new CreateKLineCanvas('.kLineBox', kLineBaseData);
+    </script>
+</body>
+</html>
