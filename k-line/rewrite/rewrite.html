@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K线图重写</title>
+
+    <style>
+        * {
+            border: 0;
+            margin: 0;
+        }
+
+        .kLineBox {
+            margin: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="kLineBox"></div>
+
+    <script src="./units.js"></script>
+    <script src="./rewrite.js"></script>
+
+    <script>
+        // 传参
+        let kLineBaseData = {
+            width: 800,
+
+            height: 600,
+            
+            xAxisData: {
+                lineColor: '#242424',
+                lineThickness: 4,
+                data: ['2023-9-10', '2023-9-11', '2023-9-12', '2023-9-13', '2023-9-14'],
+                scaleLength: 500,
+                scaleLineColor: '#cccccc',
+                textColor: '#242424',
+            },
+
+            yAxisData: {
+                lineColor: '#242424',
+                lineThickness: 4,
+                scaleLineColor: '#cccccc',
+                textColor: '#242424',
+            },
+
+            data: [
+                {
+                    date: '2023-9-1',
+                    openingNum: 20,
+                    closingNum: 10,
+                    maxNum: 25,
+                    minNum: 10,
+                    text: '1111111'
+                },
+                {
+                    date: '2023-9-2',
+                    openingNum: 20,
+                    closingNum: 5,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '2222222'
+                },
+                {
+                    date: '2023-9-3',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 15,
+                    text: '3333333'
+                },
+                {
+                    date: '2023-9-4',
+                    openingNum: 20,
+                    closingNum: 5,
+                    maxNum: 50,
+                    minNum: 5,
+                    text: '4444444'
+                },
+                {
+                    date: '2023-9-5',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-6',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-7',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-8',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-9',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-10',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-11',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-12',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-13',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-14',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-15',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-16',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-17',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-18',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-19',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+                {
+                    date: '2023-9-20',
+                    openingNum: 20,
+                    closingNum: 40,
+                    maxNum: 40,
+                    minNum: 5,
+                    text: '5555555'
+                },
+            ]
+        }
+
+        const kLineRef = new CreateKLineCanvas('.kLineBox', kLineBaseData);
+    </script>
+</body>
+</html>
