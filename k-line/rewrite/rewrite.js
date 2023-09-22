@@ -34,8 +34,22 @@ class CreateKLineCanvas {
         this.mainBox.appendChild(this.canvasBox);
     }
 
+    // 也可以用三元表达式的方式
+appendZero (obj) {
+    if (obj < 10) {
+        return '0' + obj
+      } else {
+        return obj
+      }
+}
+
     // 计算基础参数
     computeBaseParams() {
+        this.kLineParams.data.map((item) => {
+            let time = new Date(item.date)
+            item.date = time.getFullYear() + '-' + (this.appendZero(time.getMonth() + 1)) + '-' + this.appendZero(time.getDate())
+        })
+
         // // 计算y轴长度
         this.yAxisLength = this.kLineParams.height - this.paddingNum * 2;
 
@@ -149,7 +163,7 @@ class CreateKLineCanvas {
     drawAxis() {
         // x轴
         this.drawLine({
-            x1: this.originInfo.x,
+            x1: this.originInfo.x - this.xIntervalNum,
             y1: this.originInfo.y,
             x2: this.xEndInfo.x,
             y2: this.xEndInfo.y,
@@ -158,9 +172,9 @@ class CreateKLineCanvas {
 
         // y轴
         this.drawLine({
-            x1: this.originInfo.x,
+            x1: this.originInfo.x - this.xIntervalNum,
             y1: this.originInfo.y,
-            x2: this.yEndInfo.x,
+            x2: this.yEndInfo.x - this.xIntervalNum,
             y2: this.yEndInfo.y,
             lineColor: this.kLineParams.yAxisData.lineColor,
         });
@@ -175,9 +189,9 @@ class CreateKLineCanvas {
 
             if(xCoorNum != this.originInfo.x && (xCoorNum - this.originInfo.x) / this.intervalNum % 3 === 0) {
                 this.drawLine({
-                    x1: xCoorNum + this.xIntervalNum / 2,
+                    x1: xCoorNum,
                     y1: this.originInfo.y,
-                    x2: xCoorNum + this.xIntervalNum / 2,
+                    x2: xCoorNum,
                     y2: this.yEndInfo.y,
                     lineColor: '#ccc',
                     dashRequire: true,
@@ -197,7 +211,7 @@ class CreateKLineCanvas {
                 let yCoorNum = this.computeYCoordinate(yNum);
 
                 this.drawLine({
-                    x1: this.originInfo.x,
+                    x1: this.originInfo.x - this.xIntervalNum,
                     y1: yCoorNum,
                     x2: this.xEndInfo.x,
                     y2: yCoorNum,
@@ -205,7 +219,7 @@ class CreateKLineCanvas {
                     dashRequire: true,
                 });
 
-                this.drawText(yNum + this.minNum, this.originInfo.x - 20, yCoorNum, this.kLineParams.yAxisData.textColor);
+                this.drawText(yNum + this.minNum, this.originInfo.x - this.xIntervalNum - 20, yCoorNum, this.kLineParams.yAxisData.textColor);
             }
         }
     }
@@ -220,17 +234,17 @@ class CreateKLineCanvas {
 
             this.drawRect({
                 type: 'fill',
-                x: this.computeXCoordinate(item.date) + 6,
+                x: this.computeXCoordinate(item.date) - this.xIntervalNum/2,
                 y: this.computeYCoordinate(yTopNum  - this.minNum),
-                width: this.xIntervalNum - 12,
+                width: this.xIntervalNum,
                 height: heightNum,
                 color: colorCheck
             });
             
             this.drawLine({
-                x1: this.computeXCoordinate(item.date) + this.xIntervalNum / 2,
+                x1: this.computeXCoordinate(item.date),
                 y1: this.computeYCoordinate(item.maxNum - this.minNum),
-                x2: this.computeXCoordinate(item.date) + this.xIntervalNum / 2,
+                x2: this.computeXCoordinate(item.date),
                 y2: this.computeYCoordinate(item.minNum - this.minNum),
                 lineColor: colorCheck,
             })
@@ -252,13 +266,13 @@ class CreateKLineCanvas {
             // 绘制蜡烛图
             this.drawCandleChart();
 
-            let dateText = this.computeXnum(e.offsetX - this.xIntervalNum / 2);
+            let dateText = this.computeXnum(e.offsetX);
 
-            if(dateText && e.offsetX > this.originInfo.x && e.offsetX < this.xEndInfo.x) {
+            if(dateText&& e.offsetX > this.originInfo.x - this.xIntervalNum && e.offsetX < this.xEndInfo.x) {
                 this.drawLine({
-                    x1: this.computeXCoordinate(dateText) + 6,
+                    x1: this.computeXCoordinate(dateText),
                     y1: 0,
-                    x2: this.computeXCoordinate(dateText) + 6,
+                    x2: this.computeXCoordinate(dateText),
                     y2: this.originInfo.y,
                     dashRequire: true,
                 });
@@ -278,16 +292,16 @@ class CreateKLineCanvas {
                 this.drawText(Number(this.computeYnum(e.offsetY)) + this.minNum, this.originInfo.x, e.offsetY, "#000000");
             }
 
-            // this.drawTipArea(e.offsetX - 100, e.offsetY, 200);
+            this.drawTipArea(e.offsetX - 100, e.offsetY, dateText);
         })
     }
 
     // 绘制提示区域
-    drawTipArea(x, y) {
+    drawTipArea(x, y, dateText) {
         let width = 200;
 
-        if(x > this.kLineParams.width - width) x = this.kLineParams.width - width;
-        if(x < this.paddingNum) x = this.paddingNum;
+        if(x > this.xEndInfo.x) x = this.xEndInfo.x - width;
+        if(x < this.originInfo.x) x = this.originInfo.x;
 
         this.drawRect({
             x: x,
@@ -298,16 +312,17 @@ class CreateKLineCanvas {
             color: 'rgba(51, 51, 51, .8)',
         })
 
-        let positionNum = x / this.intervalNum,
-            textInfo;
+        let textInfo;
 
-        this.kLineParams.data.map((item, index) => {
-            if(positionNum > index && positionNum < index + 1) {
+        this.kLineParams.data.map((item) => {
+            if(!this.daysDifference(item.date, dateText)) {
                 textInfo = item;
             }
         })
-        
-        this.drawText(`开盘${textInfo.openingNum}, 收盘${textInfo.closingNum}, 最高${textInfo.maxNum}, 最低${textInfo.minNum}`, x + 20, 120, '#fff');
+
+        if(textInfo) {
+            this.drawText(`开盘${textInfo.openingNum}, 收盘${textInfo.closingNum}, 最高${textInfo.maxNum}, 最低${textInfo.minNum}`, x + 20, 120, '#fff');            
+        }
     }
 
     // 绘制文字
