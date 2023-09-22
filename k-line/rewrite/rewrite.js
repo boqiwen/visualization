@@ -61,7 +61,7 @@ class CreateKLineCanvas {
         }
 
         // 总天数
-        let totalDays = daysDifference(this.kLineParams.data[0].date, this.kLineParams.data[this.kLineParams.data.length - 1].date) + 1;
+        let totalDays = this.daysDifference(this.kLineParams.data[0].date, this.kLineParams.data[this.kLineParams.data.length - 1].date) + 1;
 
         // 计算x轴间距
         this.intervalNum = this.xAxisLength / totalDays;
@@ -71,7 +71,7 @@ class CreateKLineCanvas {
 
         // 计算最小值
         let startNum = this.kLineParams.data[0].minNum;
-        this.minNum = this.kLineParams.data.reduce((cur, min) => Math.min(cur, min.minNum), startNum);
+        this.minNum = this.kLineParams.data.reduce((cur, min) => Math.min(cur, min.minNum), startNum) - 2;
 
         // 计算x轴间距
         this.xIntervalNum = (this.xAxisLength / totalDays).toFixed(2);
@@ -95,20 +95,54 @@ class CreateKLineCanvas {
     // 计算x轴坐标
     computeXCoordinate(date) {
         // 计算间隔天数
-        let daysDiff = daysDifference(this.kLineParams.data[0].date, date);
+        let daysDiff = this.daysDifference(this.kLineParams.data[0].date, date);
 
-        // 计算x轴间距
-        let intervalNum = daysDiff ? daysDiff * this.intervalNum : 0;
+        // 计算距离原点距离
+        let intervalOriginNum = daysDiff ? daysDiff * this.intervalNum : 0;
 
-        return intervalNum + this.originInfo.x;
+        return intervalOriginNum + this.originInfo.x;
     }
 
     // 根据数值返回y轴坐标
     computeYCoordinate(num) {
-        // let numDiff = this.maxNum - num,
         let resNum = this.originInfo.y - num * this.yIntervalNum;
 
         return resNum;
+    }
+
+    // 根据x坐标返回数据
+    computeXnum(x) {
+        // 计算距离原点距离
+        let intervalOriginNum = x - this.originInfo.x;
+
+        // 计算间隔天数
+        let daysDiff = Number((intervalOriginNum / this.intervalNum));
+
+        let date = '';
+
+        if(daysDiff < Math.round(daysDiff) + 0.5 && daysDiff > Math.round(daysDiff) - 0.5) {
+            date = this.addDay(daysDiff + 1, this.kLineParams.data[0].date);
+        }
+
+        return date;
+    }
+
+    // 根据y坐标返回数据
+    computeYnum(y) {
+        let resNum = (this.originInfo.y - y) / this.yIntervalNum;
+
+        return resNum.toFixed(0);
+    }
+
+    // 添加天数
+    addDay(dayNumber, date) {
+        date = date ? new Date(date) : new Date();
+ 
+        var ms = dayNumber * (1000 * 60 * 60 * 24)
+ 
+        var newDate = new Date(date.getTime() + ms);
+
+        return newDate.toISOString().slice(0, 10);
     }
 
     // 绘制x轴和y轴
@@ -141,15 +175,15 @@ class CreateKLineCanvas {
 
             if(xCoorNum != this.originInfo.x && (xCoorNum - this.originInfo.x) / this.intervalNum % 3 === 0) {
                 this.drawLine({
-                    x1: xCoorNum,
+                    x1: xCoorNum + this.xIntervalNum / 2,
                     y1: this.originInfo.y,
-                    x2: xCoorNum,
+                    x2: xCoorNum + this.xIntervalNum / 2,
                     y2: this.yEndInfo.y,
                     lineColor: '#ccc',
                     dashRequire: true,
                 })
 
-                this.drawText(item.date, xCoorNum, this.originInfo.y, this.kLineParams.xAxisData.textColor);
+                this.drawText(item.date, xCoorNum - 24, this.originInfo.y + 16, this.kLineParams.xAxisData.textColor);
             }
         })
 
@@ -157,8 +191,10 @@ class CreateKLineCanvas {
         let baseNum = (this.maxNum / 5).toFixed(0);
 
         for(let i = 1; i < 6; i++) {
-            if(baseNum > this.minNum && baseNum < this.maxNum) {
-                let yCoorNum = this.computeYCoordinate(baseNum * i);
+            let yNum = baseNum * i;
+
+            if(yNum > this.minNum && yNum < this.maxNum) {
+                let yCoorNum = this.computeYCoordinate(yNum);
 
                 this.drawLine({
                     x1: this.originInfo.x,
@@ -169,7 +205,7 @@ class CreateKLineCanvas {
                     dashRequire: true,
                 });
 
-                this.drawText(baseNum * i, this.originInfo.x, yCoorNum, this.kLineParams.yAxisData.textColor);                
+                this.drawText(yNum + this.minNum, this.originInfo.x - 20, yCoorNum, this.kLineParams.yAxisData.textColor);
             }
         }
     }
@@ -184,77 +220,63 @@ class CreateKLineCanvas {
 
             this.drawRect({
                 type: 'fill',
-                x: this.computeXCoordinate(item.date),
-                y: this.computeYCoordinate(yTopNum),
-                width: this,
+                x: this.computeXCoordinate(item.date) + 6,
+                y: this.computeYCoordinate(yTopNum  - this.minNum),
+                width: this.xIntervalNum - 12,
                 height: heightNum,
                 color: colorCheck
             });
-
-            // let yTopNum = Math.max(item.openingNum, item.closingNum),
-            //     yBottomNum = Math.min(item.openingNum, item.closingNum),
-            //     colorCheck = item.openingNum === Math.min(item.openingNum, item.closingNum) ? '#09ab63' : '#f33',
-            //     xCoordinate = this.intervalNum * (index + 1); // x坐标计算
-
-            // this.drawRect({
-            //     type: 'fill',
-            //     x: xCoordinate + this.paddingNum - this.rectWidth / 2,
-            //     y: this.computeYCoordinate(yTopNum),
-            //     width: this.rectWidth,
-            //     height: yTopNum * this.yAxisLength / this.maxNum - yBottomNum * this.yAxisLength / this.maxNum,
-            //     color: colorCheck
-            // });
             
-            // this.drawLine({
-            //     x1: xCoordinate + this.paddingNum,
-            //     y1: this.computeYCoordinate(item.maxNum),
-            //     x2: xCoordinate + this.paddingNum,
-            //     y2: this.computeYCoordinate(item.minNum),
-            //     lineColor: colorCheck,
-            // })
+            this.drawLine({
+                x1: this.computeXCoordinate(item.date) + this.xIntervalNum / 2,
+                y1: this.computeYCoordinate(item.maxNum - this.minNum),
+                x2: this.computeXCoordinate(item.date) + this.xIntervalNum / 2,
+                y2: this.computeYCoordinate(item.minNum - this.minNum),
+                lineColor: colorCheck,
+            })
         });        
     }
 
     // 添加鼠标监听
     addMouseEvent() {
         this.canvasBox.addEventListener("mousemove", (e) => {
-            // // console.log(e.offsetX, e.offsetY * this.maxNum / this.yAxisLength);
-            // // 清空
-            // let ctx = this.canvasBox.getContext("2d");
-            // ctx.clearRect(0, 0, this.kLineParams.width, this.kLineParams.height);
+            // 清空
+            let ctx = this.canvasBox.getContext("2d");
+            ctx.clearRect(0, 0, this.kLineParams.width, this.kLineParams.height);
             
-            // // 重新绘制
-            // // 绘制x轴和y轴
-            // this.drawAxis();
-            // // 画辅助线和刻度
-            // this.drawAxisMarks();
-            // // 绘制蜡烛图
-            // this.drawCandleChart();
+            // 重新绘制
+            // 绘制x轴和y轴
+            this.drawAxis();
+            // 画辅助线和刻度
+            this.drawAxisMarks();
+            // 绘制蜡烛图
+            this.drawCandleChart();
 
-            // let numY = (e.offsetY * this.maxNum / this.yAxisLength).toFixed(0);
+            let dateText = this.computeXnum(e.offsetX - this.xIntervalNum / 2);
 
-            // if(e.offsetX > this.paddingNum) {
+            if(dateText && e.offsetX > this.originInfo.x && e.offsetX < this.xEndInfo.x) {
+                this.drawLine({
+                    x1: this.computeXCoordinate(dateText) + 6,
+                    y1: 0,
+                    x2: this.computeXCoordinate(dateText) + 6,
+                    y2: this.originInfo.y,
+                    dashRequire: true,
+                });
 
-            //     this.drawLine({
-            //         x1: e.offsetX,
-            //         y1: 0,
-            //         x2: e.offsetX,
-            //         y2: this.kLineParams.height,
-            //         dashRequire: true,
-            //     });                
-            // }
-
-            // if((this.maxNum - numY) > 0) {
-            //     this.drawLine({
-            //         x1: 0,
-            //         y1: e.offsetY,
-            //         x2: this.kLineParams.width,
-            //         y2: e.offsetY,
-            //         dashRequire: true,
-            //     });
-
-            //     this.drawText(this.maxNum - numY, this.paddingNum - 20, e.offsetY, "#000000");
-            // }
+                this.drawText(dateText, e.offsetX, this.originInfo.y + 30, "#000000");                  
+            }
+          
+            if(e.offsetY < this.originInfo.y && e.offsetY > this.yEndInfo.y) {
+                this.drawLine({
+                    x1: this.originInfo.x,
+                    y1: e.offsetY,
+                    x2: this.xEndInfo.x,
+                    y2: e.offsetY,
+                    dashRequire: true,
+                });
+    
+                this.drawText(Number(this.computeYnum(e.offsetY)) + this.minNum, this.originInfo.x, e.offsetY, "#000000");
+            }
 
             // this.drawTipArea(e.offsetX - 100, e.offsetY, 200);
         })
