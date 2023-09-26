@@ -11,9 +11,11 @@
       margin: 0;
     }
 
-    .mainBox {
+    .actionBox {
+      margin: 100px;
       border: 1px solid #cccccc;
-      margin: 60px;
+      width: 600px;
+      height: 600px;
     }
   </style>
 </head>
@@ -22,12 +24,11 @@
     <div class="actionBox"></div>
   </div>
   
-  
   <script src="./index.js"></script>
+  <script src="./drag.js"></script>
   <script>
     let baseParams = {
-      height: 400,
-      width: 400
+      type: 'cubic', // quadratic || cubic
     };
 
     let bezierCanvas = new CreateBezierDrag('.actionBox', baseParams);
