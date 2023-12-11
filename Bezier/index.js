@@ -3,6 +3,7 @@ class CreateBezierDrag {
     this.actionBox = document.querySelector(actionDom);
 
     this.canvasParams = params;
+    this.bezierParams = null;
 
     this.init();
   }
@@ -10,66 +11,66 @@ class CreateBezierDrag {
   init() {
     this.initCanvas();
     this.initDate();
+    this.initDraw();
 
-    this.initDragPoint();
+    setTimeout(() => {
+      this.initDragPoint();
+    });
   }
 
   // 创建画布
   initCanvas() {
     this.canvasBox = document.createElement("canvas");
-
-    this.canvasBox.width = this.actionBox.offsetWidth;
-    this.canvasBox.height = this.actionBox.offsetHeight;
-    this.canvasBox.style.width = this.actionBox.offsetWidth;
-    this.canvasBox.style.height = this.actionBox.offsetHeight;
-
     this.actionBox.appendChild(this.canvasBox);
+
+    // 解决锯齿
+    let width = this.actionBox.offsetWidth,
+      height = this.actionBox.offsetHeight,
+      context = this.canvasBox.getContext("2d"),
+      devicePixelRatio = window.devicePixelRatio || 1,
+      backingStoreRatio = context.webkitBackingStorePixelRatio
+        || context.mozBackingStorePixelRatio
+        || context.msBackingStorePixelRatio
+        || context.oBackingStorePixelRatio
+        || context.backingStorePixelRatio
+        || 1,
+        ratio = devicePixelRatio / backingStoreRatio;
+
+    this.canvasBox.style.width = width + "px";
+    this.canvasBox.style.height = height + "px";
+    this.canvasBox.height = height * ratio;
+    this.canvasBox.width = width * ratio;
+    context.scale(ratio, ratio);
   }
 
   // 初始化数据
   initDate() {
     this.bezierParams = {
-      initialPoint: {
-        x: 0,
-        y: this.canvasBox.height
-      },
+      initialPoint: { x: 0, y: this.canvasBox.clientHeight },
 
       controlPoint: {
-        x: this.canvasBox.width / 4,
-        y: this.canvasBox.height / 4
+        x: this.canvasBox.clientWidth / 4,
+        y: this.canvasBox.clientHeight / 4
       },
 
       controlPointTwo: {
-        x: this.canvasBox.width * 3 / 4,
-        y: this.canvasBox.height * 3 / 4
+        x: this.canvasBox.clientWidth * 3 / 4,
+        y: this.canvasBox.clientHeight * 3 / 4
       },
 
-      endPoint: {
-        x: this.canvasBox.width,
-        y: 0
-      }
+      endPoint: { x: this.canvasBox.clientWidth, y: 0 }
     }
   }
 
   // 创建拖拽点
   initDragPoint() {
-    this.initDraw();
-
     // 基础参数
     let onePointDragData = {
-      width: 20,
-      height: 20,
-      top: this.bezierParams.controlPoint.y - 10,
-      left: this.bezierParams.controlPoint.x - 10,
-      backgroundColor: '#ccc',
-      className: 'redBox'
-    }
-
-    let twoPointDragData = {
-      width: 20,
-      height: 20,
-      top: this.bezierParams.controlPointTwo.y - 10,
-      left: this.bezierParams.controlPointTwo.x - 10,
+      width: 30,
+      height: 30,
+      r: 10,
+      centerY: this.bezierParams.controlPoint.y,
+      centerX: this.bezierParams.controlPoint.x,
       backgroundColor: '#ccc',
       className: 'redBox'
     }
@@ -77,19 +78,29 @@ class CreateBezierDrag {
     let controlPointOne = new CreateDrag('.actionBox', onePointDragData);
     controlPointOne.throwCoordinate = (x, y) => {
       this.bezierParams.controlPoint = {
-        x: x - this.actionBox.offsetLeft + 10,
-        y: y - this.actionBox.offsetTop + 10
+        x: x - this.actionBox.offsetLeft,
+        y: y - this.actionBox.offsetTop
       }
 
       this.initDraw();
     }
 
+    // 控制点点击事件测试
+    controlPointOne.onclick = (e) => {
+      console.log(e.pageX, e.pageY);
+    }
+
+    // 二次贝塞尔曲线的第二个控制点
     if(this.canvasParams.type === 'cubic') {
+      let twoPointDragData = {...onePointDragData};
+      twoPointDragData.centerX = this.bezierParams.controlPointTwo.x;
+      twoPointDragData.centerY = this.bezierParams.controlPointTwo.y;
+
       let controlPointTwo = new CreateDrag('.actionBox', twoPointDragData);
       controlPointTwo.throwCoordinate = (x, y) => {
         this.bezierParams.controlPointTwo = {
-          x: x - this.actionBox.offsetLeft + 10,
-          y: y - this.actionBox.offsetTop + 10
+          x: x - this.actionBox.offsetLeft,
+          y: y - this.actionBox.offsetTop
         }
 
         this.initDraw();
@@ -101,14 +112,12 @@ class CreateBezierDrag {
   initDraw() {
     // 清空
     let ctx = this.canvasBox.getContext("2d");
-    ctx.clearRect(0, 0, this.canvasBox.width, this.canvasBox.height);
+    ctx.clearRect(0, 0, this.canvasBox.clientWidth, this.canvasBox.clientHeight);
 
-    this.drawCircle(this.bezierParams.controlPoint.x, this.bezierParams.controlPoint.y, 5);
     this.drawLine(this.bezierParams.initialPoint.x, this.bezierParams.initialPoint.y, this.bezierParams.controlPoint.x, this.bezierParams.controlPoint.y);
     this.initBezierBox();
 
     if(this.canvasParams.type === 'cubic') {
-      this.drawCircle(this.bezierParams.controlPointTwo.x, this.bezierParams.controlPointTwo.y, 5);
       this.drawLine(this.bezierParams.endPoint.x, this.bezierParams.endPoint.y, this.bezierParams.controlPointTwo.x, this.bezierParams.controlPointTwo.y);
     }
   }
@@ -131,19 +140,8 @@ class CreateBezierDrag {
       ctx.quadraticCurveTo(this.bezierParams.controlPoint.x, this.bezierParams.controlPoint.y, this.bezierParams.endPoint.x, this.bezierParams.endPoint.y);
     }
     
+    ctx.lineWidth = 1;
     ctx.stroke();
-
-    ctx.closePath();
-  }
-
-  // 绘制圆形
-  drawCircle(x, y, r) {
-    let ctx = this.canvasBox.getContext("2d");
-
-    ctx.beginPath();
-
-    ctx.arc(x, y, r, 0, 2 * Math.PI);
-    ctx.fill();
 
     ctx.closePath();
   }
@@ -157,6 +155,7 @@ class CreateBezierDrag {
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.closePath(); // 闭合路径
+    ctx.lineWidth = 1;
     ctx.stroke(); // 笔画绘制
     ctx.fill(); // 填充
 

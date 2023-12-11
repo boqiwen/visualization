@@ -8,3 +8,33 @@
 ## 考虑拖拽点形状（非圆形）
 ## 时间冒泡
 ## 如何去创造元素 重新封装 把拖拽点的绘制过程单独抽离
+
+## 解决绘制的锯齿
+### 问题原因: 
+1.  devicePixelRatio = device pixel / CSS pixel
+  如果 devicePixelRatio = 2 那么对于 200px * 200px 的图片要绘制到屏幕中，那么对应的屏幕像素(物理像素) 就是 400px * 400px
+
+2.  例如: 在大部分高清屏中 webkitBackingStorePixelRatio = 1; devicePixelRatio = 2
+  将一个 200px * 200px 的图片 Cavnas 绘制到该屏幕中的流程如下:
+  webkitBackingStorePixelRatio = 1
+  绘制到缓存区的大小也为：200px * 200px;
+  devicePixelRatio = 2
+  200px * 200px 的图片对应到屏幕像素为 400px * 400px, devicePixelRatio = 2 浏览器就把缓存区的 200px * 200px 宽高分别放大两倍渲染到屏幕中，所以就导致模糊
+
+### 解决方法
+  context = this.canvasBox.getContext("2d"),
+  devicePixelRatio = window.devicePixelRatio || 1,
+  backingStoreRatio = context.webkitBackingStorePixelRatio
+    || context.mozBackingStorePixelRatio
+    || context.msBackingStorePixelRatio
+    || context.oBackingStorePixelRatio
+    || context.backingStorePixelRatio
+    || 1,
+    ratio = devicePixelRatio / backingStoreRatio;
+    
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+  <!-- 放大 -->
+  canvas.height = height * ratio;
+  canvas.width = width * ratio;
+  context.scale(ratio, ratio);
